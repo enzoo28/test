@@ -64,13 +64,6 @@ if (-not $licenseOk) {
     }
     Write-Host "[*] License activated. Continuing..."
 }
-        Write-Host "[+] License activated successfully."
-    } else {
-        Write-Host "[+] License check passed."
-    }
-} else {
-    Write-Host "[*] No license server configured - skipping license check."
-}
 
 #  Kill any existing processes 
 Write-Host "[*] Killing existing bridge_mitm_proxy / vol_hist_server / Deepchart / VolumetricaBridge processes ..."
