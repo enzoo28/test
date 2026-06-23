@@ -54,30 +54,32 @@ if (-not (Test-Path $configFile)) {
 
 if ($needsSetup) {
     $setupScript = Join-Path $root "setup_config.py"
-    if (Test-Path $setupScript) {
-        Write-Host "[*] Launching setup wizard..."
-        if ($env:PYTHON_EXE) { $py = $env:PYTHON_EXE } else { $py = 'python' }
-        & $py $setupScript
-        if (Test-Path $configFile) {
-            try {
-                $cfg = Get-Content $configFile -Raw | ConvertFrom-Json
-                if ($cfg.data_source -eq "rithmic") {
-                    $env:RITHMIC_MODE = "1"
-                    $env:RITHMIC_USER   = $cfg.rithmic.user
-                    $env:RITHMIC_PASSWORD = $cfg.rithmic.password
-                    if ($cfg.rithmic.system) { $env:RITHMIC_SYSTEM = $cfg.rithmic.system }
-                    if ($cfg.rithmic.url)    { $env:RITHMIC_URL    = $cfg.rithmic.url }
-                } else {
-                    $env:RITHMIC_MODE = ""
-                }
-            } catch { Write-Host "[!] Could not re-read config: $_" }
-        } else {
-            Write-Host "[!] No config after setup — exiting."
-            Pause; exit 1
-        }
-    } else {
+    if (-not (Test-Path $setupScript)) {
         Write-Host "[!] setup_config.py not found. Create bridge_config.json manually."
-        Pause; exit 1
+        Pause
+        exit 1
+    }
+    Write-Host "[*] Launching setup wizard..."
+    if ($env:PYTHON_EXE) { $py = $env:PYTHON_EXE } else { $py = 'python' }
+    & $py $setupScript
+    if (-not (Test-Path $configFile)) {
+        Write-Host "[!] No config after setup - exiting."
+        Pause
+        exit 1
+    }
+    try {
+        $cfg = Get-Content $configFile -Raw | ConvertFrom-Json
+    } catch {
+        Write-Host "[!] Could not re-read config: $_"
+    }
+    if ($cfg.data_source -eq "rithmic") {
+        $env:RITHMIC_MODE = "1"
+        $env:RITHMIC_USER   = $cfg.rithmic.user
+        $env:RITHMIC_PASSWORD = $cfg.rithmic.password
+        if ($cfg.rithmic.system) { $env:RITHMIC_SYSTEM = $cfg.rithmic.system }
+        if ($cfg.rithmic.url)    { $env:RITHMIC_URL    = $cfg.rithmic.url }
+    } else {
+        $env:RITHMIC_MODE = ""
     }
 }
 
