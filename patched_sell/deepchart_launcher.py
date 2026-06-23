@@ -65,6 +65,18 @@ def main():
 
     print(f"[LICENSE] Valid — {days} days remaining")
 
+    # Run setup wizard if no config found
+    config_file = _LAUNCHER_DIR / "bridge_config.json"
+    if not config_file.exists():
+        setup_py = _LAUNCHER_DIR / "setup_config.py"
+        if setup_py.exists():
+            print("[*] No config found — launching setup wizard...")
+            subprocess.call([sys.executable, str(setup_py)])
+        else:
+            print("[!] No bridge_config.json and setup_config.py not found.")
+            input("Press Enter to exit...")
+            sys.exit(1)
+
     # Launch the system
     ps1 = _LAUNCHER_DIR / "start_servers.ps1"
     if not ps1.exists():

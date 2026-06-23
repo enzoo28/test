@@ -40,6 +40,47 @@ if (Test-Path $configFile) {
     Write-Host "[*] RITHMIC_MODE=1 detected (RITHMIC_USER env var set)"
 }
 
+#  If config is missing or incomplete, run setup wizard
+$needsSetup = $false
+if (-not (Test-Path $configFile)) {
+    Write-Host "[!] bridge_config.json not found."
+    $needsSetup = $true
+} elseif (-not $cfg) {
+    $needsSetup = $true
+} elseif ($cfg.data_source -eq "rithmic" -and [string]::IsNullOrEmpty($cfg.rithmic.user)) {
+    Write-Host "[!] Rithmic mode selected but username is empty."
+    $needsSetup = $true
+}
+
+if ($needsSetup) {
+    $setupScript = Join-Path $root "setup_config.py"
+    if (Test-Path $setupScript) {
+        Write-Host "[*] Launching setup wizard..."
+        $py = if ($env:PYTHON_EXE) { $env:PYTHON_EXE } else { 'python' }
+        & $py $setupScript
+        if (Test-Path $configFile) {
+            try {
+                $cfg = Get-Content $configFile -Raw | ConvertFrom-Json
+                if ($cfg.data_source -eq "rithmic") {
+                    $env:RITHMIC_MODE = "1"
+                    $env:RITHMIC_USER   = $cfg.rithmic.user
+                    $env:RITHMIC_PASSWORD = $cfg.rithmic.password
+                    if ($cfg.rithmic.system) { $env:RITHMIC_SYSTEM = $cfg.rithmic.system }
+                    if ($cfg.rithmic.url)    { $env:RITHMIC_URL    = $cfg.rithmic.url }
+                } else {
+                    $env:RITHMIC_MODE = ""
+                }
+            } catch { Write-Host "[!] Could not re-read config: $_" }
+        } else {
+            Write-Host "[!] No config after setup — exiting."
+            Pause; exit 1
+        }
+    } else {
+        Write-Host "[!] setup_config.py not found. Create bridge_config.json manually."
+        Pause; exit 1
+    }
+}
+
 # Pick Python executable — determined AFTER config sets RITHMIC_MODE
 if ($env:PYTHON_EXE) {
     $pythonExe = $env:PYTHON_EXE
