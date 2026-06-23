@@ -1025,17 +1025,9 @@ async def handle(client_r, client_w):
     log.info(f"[-] Disconnected {peer}")
 
 
-# ─── License check (offline) ──────────────────────────────────────────────────
-def _check_license() -> bool:
-    log.info("[LICENSE] Development mode — license check bypassed")
-    return True
-
 # ─── Main ───────────────────────────────────────────────────────────────────────
 async def main():
     global client_ctx
-
-    if not _check_license():
-        return
 
     ensure_ca()
 

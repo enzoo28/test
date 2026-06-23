@@ -104,21 +104,7 @@ if ($env:PYTHON_EXE) {
     $pythonExe = 'python'
 }
 
-#  License check (offline, .lic file based)
-Write-Host "[*] Running license check..."
-$licenseResult = & $pythonExe "$root\license_check.py" 2>&1
-foreach ($line in $licenseResult) { Write-Host "  $line" }
-$licenseOk = $LASTEXITCODE -eq 0
-if (-not $licenseOk) {
-    Write-Host "[!] No valid license - launching login window..."
-    $loginResult = & $pythonExe "$root\license_login.py" 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "[!] License activation cancelled or failed - exiting."
-        Pause
-        exit 1
-    }
-    Write-Host "[*] License activated. Continuing..."
-}
+#  License was already validated by deepchart_launcher.exe
 
 #  Kill any existing processes 
 Write-Host "[*] Killing existing bridge_mitm_proxy / vol_hist_server / Deepchart / VolumetricaBridge processes ..."
