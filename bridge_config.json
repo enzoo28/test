@@ -1,0 +1,43 @@
+{
+    "_comment": "Deepchart Bridge Configuration",
+    "_comment_data_source": "'rithmic' or 'cqg'. CQG uses the free AMP demo by default.",
+    "data_source": "cqg",
+
+    "rithmic": {
+        "_comment_user": "Your Rithmic username (email from your broker)",
+        "user": "",
+        "_comment_password": "Your Rithmic password",
+        "password": "",
+        "_comment_system": "Rithmic Paper Trading Chicago (or your broker's system)",
+        "system": "Rithmic Paper Trading Chicago",
+        "_comment_url": "Gateway URL from your broker",
+        "url": ""
+    },
+
+    "cqg": {
+        "_comment_user": "CQG demo user (free, no account needed)",
+        "user": "demo87820",
+        "_comment_password": "CQG demo password",
+        "password": "AMPDemo1"
+    },
+
+    "dxfeed": {
+        "_comment": "DXFeed requires your own account. Configure in Deepchart UI: Data Sources → Add → DXFeed. Enter your credentials there. There is no free/delayed endpoint available."
+    },
+
+    "license": {
+        "_comment_server_url": "Your license server URL from Deepchart. Leave empty to skip.",
+        "server_url": "http://localhost:9876"
+    },
+
+    "bridge": {
+        "port": 443,
+        "bind_host": "0.0.0.0"
+    },
+
+    "cqg_server_override": {
+        "host": "208.48.16.22",
+        "port": 443,
+        "sni": "demoapi.cqg.com"
+    }
+}
