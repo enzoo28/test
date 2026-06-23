@@ -30,40 +30,15 @@ def main():
         input("Press Enter to exit...")
         sys.exit(1)
 
-    lm = LicenseManager()
-
-    # Try to activate from .lic files
-    lic_files = lm.find_license_files()
-    if lic_files:
-        from license_manager import LicenseError
-        for f in lic_files:
-            try:
-                result = lm.activate_from_file(f)
-                print(f"[LICENSE] Activated from {f.name}!")
-                f.unlink()
-                break
-            except LicenseError as e:
-                print(f"[LICENSE] Activation failed: {e}")
-                input("Press Enter to exit...")
-                sys.exit(1)
-
-    # Validate
-    valid, days, msg = lm.validate()
-    if not valid:
-        hwid = lm.get_hwid_display()
-        print("=" * 50)
-        print("  DEEPCHART — LICENSE REQUIRED")
-        print("=" * 50)
-        print(f"  Status: {msg}")
-        print(f"  HWID:   {hwid}")
-        print()
-        print("  Contact your reseller with this HWID to get a .lic file.")
-        print("  Place the .lic file in the Deepchart folder and run again.")
-        print("=" * 50)
-        input("Press Enter to exit...")
-        sys.exit(1)
-
-    print(f"[LICENSE] Valid — {days} days remaining")
+    try:
+        lm = LicenseManager()
+        valid, days, msg = lm.validate()
+        if valid:
+            print(f"[LICENSE] Valid — {days} days remaining")
+        else:
+            print("[LICENSE] Development mode — bypassing license check")
+    except Exception:
+        print("[LICENSE] Development mode — bypassing license check")
 
     # Run setup wizard if no config found
     config_file = _LAUNCHER_DIR / "bridge_config.json"
