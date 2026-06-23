@@ -56,7 +56,7 @@ if ($needsSetup) {
     $setupScript = Join-Path $root "setup_config.py"
     if (Test-Path $setupScript) {
         Write-Host "[*] Launching setup wizard..."
-        $py = if ($env:PYTHON_EXE) { $env:PYTHON_EXE } else { 'python' }
+        if ($env:PYTHON_EXE) { $py = $env:PYTHON_EXE } else { $py = 'python' }
         & $py $setupScript
         if (Test-Path $configFile) {
             try {
