@@ -40,11 +40,23 @@ if (Test-Path $configFile) {
     Write-Host "[*] RITHMIC_MODE=1 detected (RITHMIC_USER env var set)"
 }
 
-# Pick Python executable  determined AFTER config sets RITHMIC_MODE
+# Pick Python executable — determined AFTER config sets RITHMIC_MODE
 if ($env:PYTHON_EXE) {
     $pythonExe = $env:PYTHON_EXE
 } elseif ($env:RITHMIC_MODE) {
-    $pythonExe = 'C:\Users\erand.bazaj\AppData\Local\Programs\Python\Python313\python.exe'
+    # Rithmic requires Python 3.13 (protobuf 4.x compatibility)
+    $py313 = Get-Command "python3.13" -ErrorAction SilentlyContinue
+    if ($py313) {
+        $pythonExe = $py313.Source
+    } else {
+        $pyLauncher = py -3.13 -c "import sys; print(sys.executable)" 2>$null
+        if ($pyLauncher) {
+            $pythonExe = $pyLauncher
+        } else {
+            Write-Host "[!] Python 3.13 not found. Rithmic mode needs Python 3.13. Set PYTHON_EXE env var or install Python 3.13."
+            $pythonExe = 'python'
+        }
+    }
 } else {
     $pythonExe = 'python'
 }
