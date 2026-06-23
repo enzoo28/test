@@ -49,22 +49,21 @@ if ($env:PYTHON_EXE) {
     $pythonExe = 'python'
 }
 
-#  License check
-if ($cfg -and $cfg.license.server_url) {
-    $env:LICENSE_SERVER_URL = $cfg.license.server_url
-    Write-Host "[*] License server: $env:LICENSE_SERVER_URL"
-    Write-Host "[*] Running license check..."
-    $licenseResult = & $pythonExe "$root\license_check.py" 2>&1
-    foreach ($line in $licenseResult) { Write-Host "  $line" }
-    $licenseOk = $LASTEXITCODE -eq 0
-    if (-not $licenseOk) {
-        Write-Host "[!] No valid license - launching login window..."
-        $loginResult = & $pythonExe "$root\license_login.py" 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "[!] License activation cancelled or failed - exiting."
-            $loginResult | ForEach-Object { Write-Host "  $_" }
-            exit 1
-        }
+#  License check (offline, .lic file based)
+Write-Host "[*] Running license check..."
+$licenseResult = & $pythonExe "$root\license_check.py" 2>&1
+foreach ($line in $licenseResult) { Write-Host "  $line" }
+$licenseOk = $LASTEXITCODE -eq 0
+if (-not $licenseOk) {
+    Write-Host "[!] No valid license - launching login window..."
+    $loginResult = & $pythonExe "$root\license_login.py" 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[!] License activation cancelled or failed - exiting."
+        Pause
+        exit 1
+    }
+    Write-Host "[*] License activated. Continuing..."
+}
         Write-Host "[+] License activated successfully."
     } else {
         Write-Host "[+] License check passed."
